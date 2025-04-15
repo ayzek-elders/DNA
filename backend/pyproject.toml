@@ -9,5 +9,8 @@ dependencies = [
     "fastapi>=0.115.12",
     "google-adk>=0.1.0",
     "pydantic[email]>=2.11.3",
+    "pytest>=8.3.5",
+    "pytest-cov>=6.1.1",
     "ruff>=0.11.5",
+    "sqlmodel>=0.0.24",
 ]
