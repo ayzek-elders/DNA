@@ -1,19 +1,10 @@
-Get-Content -LiteralPath ../.local.env | ForEach-Object {
-  $line = $_.trim()
-  if ($line -match "^\s*#") {
-    Write-Verbose -Message "Found comment $line at line $linecursor. discarding"
-  }
-  elseif ($line -match "^\s*$") {
-    Write-Verbose -Message "Found a blank line at line $linecursor, discarding"
-  }
-  elseif ($line -match "^\s*(?<key>[^\n\b\a\f\v\r\s]+)\s*=\s*(?<value>[^\n\b\a\f\v\r]*)$") {
-    $key = $Matches["key"]
-    $value = $Matches["value"]
-    Write-Verbose -Message "Found [$key] with value [$value]"
-    [System.Environment]::SetEnvironmentVariable($key, $value, [System.EnvironmentVariableTarget]::Process)
-  
+$envContent = Get-Content ../.local.env
+foreach ($line in $envContent) {
+  if ($line -match '^([^=]+)=(.*)$') {
+    Set-Item -Path "Env:$($matches[1])" -Value $matches[2]
   }
 }
+
 
 docker-compose -f ../docker-compose.yml up -d
 
