@@ -1,12 +1,14 @@
+import os
 import secrets
 from pydantic import EmailStr, HttpUrl, PostgresDsn, computed_field
 from pydantic_core import MultiHostUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Literal
 
+
 class Settings(BaseSettings):
   model_config = SettingsConfigDict(
-    env_file="../.local.env",
+    env_file="../../../.env",  
     env_ignore_empty=True,
     extra="ignore"
   )
@@ -26,14 +28,17 @@ class Settings(BaseSettings):
   @property
   def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:
       return MultiHostUrl.build(
-          scheme="postgresql+psycopg",
+          scheme="postgresql+psycopg2",
           username=self.POSTGRES_USER,
           password=self.POSTGRES_PASSWORD,
           host=self.POSTGRES_SERVER,
           port=self.POSTGRES_PORT,
           path=self.POSTGRES_DB,
       )
-  
+  @computed_field
+  @property
+  def POSTGRES_CONNECTION_STRING(self) -> str:
+      return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
   EMAIL_TEST_USER: EmailStr = "test@example.com"
   FIRST_SUPERUSER: EmailStr
   FIRST_SUPERUSER_PASSWORD: str

@@ -20,6 +20,8 @@ uv sync
 
 then you can activate your virtual env.
 
+to apply migrattions `alembic upgrade head`
+
 ## How to write test
 
 ### Unit Tests

@@ -9,7 +9,7 @@
 ## Initial Setup
 
 1. Clone the repository
-2. Create a `.local.env` file in the root directory with the following variables:
+2. Create a `.env` file in the root directory with the following variables:
    ```env
    POSTGRES_DB=your_database_name
    POSTGRES_USER=your_username
