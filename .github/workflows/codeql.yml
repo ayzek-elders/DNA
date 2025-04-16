@@ -1,0 +1,55 @@
+name: "CodeQL Advanced"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '21 18 * * 0'  # Runs at 18:21 UTC every Sunday
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+      packages: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'python' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'  # Matching your project's Python version
+        cache: 'uv'  # Using uv for dependency caching
+
+    - name: Install uv
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        uv --version
+
+    - name: Install dependencies
+      run: |
+        uv venv
+        uv pip install -r requirements.txt || uv sync  # Fallback to uv sync if requirements.txt doesn't exist
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+        queries: +security-extended,security-and-quality
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{matrix.language}}"
