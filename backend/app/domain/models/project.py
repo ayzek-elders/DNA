@@ -1,4 +1,3 @@
-import uuid 
 from sqlmodel import Field, SQLModel
 from .auditable_entity import AuditableEntity
 
