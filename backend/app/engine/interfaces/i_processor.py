@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional
-from  backend.app.engine.graph.graph_event import GraphEvent
+from  app.engine.graph.graph_event import GraphEvent
 
 class IProcessor(ABC):
     @abstractmethod

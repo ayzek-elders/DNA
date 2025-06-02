@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABC
 
-from  backend.app.engine.graph.graph_event import GraphEvent
+from  app.engine.graph.graph_event import GraphEvent
 
 class IObserver(ABC):
     @abstractmethod

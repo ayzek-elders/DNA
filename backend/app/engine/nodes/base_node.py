@@ -2,7 +2,7 @@ from collections import deque
 from datetime import datetime
 import logging
 from typing import Any, Callable, Dict, List, Set
-from  backend.app.engine.graph.graph_event import EventType, GraphEvent, NodeState
+from  app.engine.graph.graph_event import EventType, GraphEvent, NodeState
 from  app.engine.interfaces.i_observer import IObserver
 from  app.engine.interfaces.i_processor import IProcessor
 from  app.engine.interfaces.i_subject import ISubject

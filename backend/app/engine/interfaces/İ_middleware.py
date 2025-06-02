@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from  backend.app.engine.graph.graph_event import GraphEvent
+from  app.engine.graph.graph_event import GraphEvent
 
 
 class IMiddleware(ABC):
