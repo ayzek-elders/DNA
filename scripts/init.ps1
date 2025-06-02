@@ -61,9 +61,11 @@ function Initialize-VirtualEnvironment {
     if (-not (Test-Path -Path $venvPath)) {
       Write-Host "Creating new virtual environment" -ForegroundColor Yellow
       pip install uv
+      pip install virtualenv
       if (-not $?) { throw "Failed to install uv" }
-            
-      uv sync
+      python -m venv .venv
+      if (-not $?) { throw "Failed to create virtual environment" }
+      python -m uv sync
       if (-not $?) { throw "Failed to sync dependencies" }
             
       Write-Host "Dependencies installed successfully" -ForegroundColor Green

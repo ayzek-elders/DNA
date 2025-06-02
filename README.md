@@ -5,6 +5,7 @@
 - Docker and Docker Compose installed
 - Git (for cloning the repository)
 - PostgreSQL client (optional, for direct database access)
+- if using macos curl -LsSf https://astral.sh/uv/install.sh | sh for windows powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 
 ## Initial Setup
 
