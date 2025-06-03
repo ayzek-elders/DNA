@@ -54,6 +54,38 @@ class HTTPProcessor(IProcessor):
             return await response.text()
         return await response.read()
 
+    async def _handle_request_exceptions(self, attempt: int, event: GraphEvent, context: Dict[str, Any], error: Exception) -> GraphEvent | None:
+        if isinstance(error, asyncio.TimeoutError):
+            logger.warning(f"Request timeout on attempt {attempt + 1}/{self.retries}")
+            if attempt == self.retries - 1:
+                return self.create_error_event("Request timeout", event, context["node_id"])
+        
+        elif isinstance(error, aiohttp.ClientError):
+            logger.error(f"HTTP request error on attempt {attempt + 1}/{self.retries}: {str(error)}")
+            if attempt == self.retries - 1:
+                return self.create_error_event(f"HTTP request failed: {str(error)}", event, context["node_id"])
+        
+        else:
+            logger.error(f"Unexpected error on attempt {attempt + 1}/{self.retries}: {str(error)}")
+            return self.create_error_event(f"Unexpected error: {str(error)}", event, context["node_id"])
+        
+        return None
+    
+    def _create_response_event(self, response_data: Any, status: int, event: GraphEvent, node_id: str, attempt: int) -> GraphEvent:
+        return GraphEvent(
+            type=EventType.COMPUTATION_RESULT,
+            data={
+                "content": response_data,
+                "status": status
+            },
+            metadata={
+                "status": status,
+                "attempt": attempt + 1,
+                **event.metadata
+            },
+            source_id=event.source_id
+        )
+
 class HTTPGetRequestProcessor(HTTPProcessor):
     """
     Processor for handling HTTP GET requests.
@@ -69,33 +101,12 @@ class HTTPGetRequestProcessor(HTTPProcessor):
             try:
                 async with aiohttp.ClientSession(timeout=self.client_timeout) as session:
                     response_data, status = await self._get_request(session, event.data["url"], self.headers)
-                    response_event = GraphEvent(
-                        type=EventType.COMPUTATION_RESULT,
-                        data={
-                            "content": response_data,
-                            "status": status
-                        },
-                        metadata={
-                            "status": status,
-                            "attempt": attempt + 1,
-                            **event.metadata
-                        },
-                        source_id=event.source_id
-                    )
+                    response_event = self._create_response_event(response_data, status, event, context["node_id"], attempt)
                     return response_event
-            except asyncio.TimeoutError:
-                logger.warning(f"Request timeout on attempt {attempt + 1}/{self.retries}")
-                if attempt == self.retries - 1:
-                    return self.create_error_event("Request timeout", event, context["node_id"])
-            
-            except aiohttp.ClientError as e:
-                logger.error(f"HTTP request error on attempt {attempt + 1}/{self.retries}: {str(e)}")
-                if attempt == self.retries - 1:
-                    return self.create_error_event(f"HTTP request failed: {str(e)}", event, context["node_id"])
-            
             except Exception as e:
-                logger.error(f"Unexpected error on attempt {attempt + 1}/{self.retries}: {str(e)}")
-                return self.create_error_event(f"Unexpected error: {str(e)}", event, context["node_id"])
+                error_event = await self._handle_request_exceptions(attempt, event, context, e)
+                if error_event:
+                    return error_event
             
             if attempt < self.retries - 1:
                 await asyncio.sleep(self.retry_delay)
@@ -107,7 +118,6 @@ class HTTPGetRequestProcessor(HTTPProcessor):
         async with session.get(url, headers=headers) as response:
             response.raise_for_status()
             status = response.status
-                
             return await self._convert_response(response), status
 
 class HTTPPostRequestProcessor(HTTPProcessor):
@@ -125,33 +135,12 @@ class HTTPPostRequestProcessor(HTTPProcessor):
             try:
                 async with aiohttp.ClientSession(timeout=self.client_timeout) as session:
                     response_data, status = await self._post_request(session, event.data["url"], self.headers, event.data["data"])
-                    response_event = GraphEvent(
-                        type=EventType.COMPUTATION_RESULT,
-                        data={
-                            "content": response_data,
-                            "status": status
-                        },
-                        metadata={
-                            "status": status,
-                            "attempt": attempt + 1,
-                            **event.metadata
-                        },
-                        source_id=event.source_id
-                    )
+                    response_event = self._create_response_event(response_data, status, event, context["node_id"], attempt)
                     return response_event
-            except asyncio.TimeoutError:
-                logger.warning(f"Request timeout on attempt {attempt + 1}/{self.retries}")
-                if attempt == self.retries - 1:
-                    return self.create_error_event("Request timeout", event, context["node_id"])
-            
-            except aiohttp.ClientError as e:
-                logger.error(f"HTTP request error on attempt {attempt + 1}/{self.retries}: {str(e)}")
-                if attempt == self.retries - 1:
-                    return self.create_error_event(f"HTTP request failed: {str(e)}", event, context["node_id"])
-            
             except Exception as e:
-                logger.error(f"Unexpected error on attempt {attempt + 1}/{self.retries}: {str(e)}")
-                return self.create_error_event(f"Unexpected error: {str(e)}", event, context["node_id"])
+                error_event = await self._handle_request_exceptions(attempt, event, context, e)
+                if error_event:
+                    return error_event
             
             if attempt < self.retries - 1:
                 await asyncio.sleep(self.retry_delay)
@@ -163,5 +152,107 @@ class HTTPPostRequestProcessor(HTTPProcessor):
         async with session.post(url, headers=headers, json=data) as response:
             response.raise_for_status()
             status = response.status
+            return await self._convert_response(response), status
+
+class HTTPPutRequestProcessor(HTTPProcessor):
+    """
+    Processor for handling HTTP PUT requests.
+
+    Inherits from HTTPProcessor and implements the process method for PUT requests.
+    """
+    async def process(self, event: GraphEvent, context: Dict[str, Any]):
+        if not self._validate_request_data(event.data):
+            error_event = self.create_error_event("Invalid request data", event, context["node_id"])
+            return error_event
+        
+        for attempt in range(self.retries):
+            try:
+                async with aiohttp.ClientSession(timeout=self.client_timeout) as session:
+                    response_data, status = await self._put_request(session, event.data["url"], self.headers, event.data["data"])
+                    response_event = self._create_response_event(response_data, status, event, context["node_id"], attempt)
+                    return response_event
+            except Exception as e:
+                error_event = await self._handle_request_exceptions(attempt, event, context, e)
+                if error_event:
+                    return error_event
             
+            if attempt < self.retries - 1:
+                await asyncio.sleep(self.retry_delay)
+    
+    def can_handle(self, event):
+        return event.type == EventType.DATA_CHANGE
+    
+    async def _put_request(self, session: aiohttp.ClientSession, url: str, headers: Dict[str, str], data: Any) -> tuple[Any, int]:
+        async with session.put(url, headers=headers, json=data) as response:
+            response.raise_for_status()
+            status = response.status
+            return await self._convert_response(response), status
+
+class HTTPDeleteRequestProcessor(HTTPProcessor):
+    """
+    Processor for handling HTTP DELETE requests.
+
+    Inherits from HTTPProcessor and implements the process method for DELETE requests.
+    """
+    async def process(self, event: GraphEvent, context: Dict[str, Any]):
+        if not self._validate_request_data(event.data):
+            error_event = self.create_error_event("Invalid request data", event, context["node_id"])
+            return error_event
+        
+        for attempt in range(self.retries):
+            try:
+                async with aiohttp.ClientSession(timeout=self.client_timeout) as session:
+                    response_data, status = await self._delete_request(session, event.data["url"], self.headers)
+                    response_event = self._create_response_event(response_data, status, event, context["node_id"], attempt)
+                    return response_event
+            except Exception as e:
+                error_event = await self._handle_request_exceptions(attempt, event, context, e)
+                if error_event:
+                    return error_event
+            
+            if attempt < self.retries - 1:
+                await asyncio.sleep(self.retry_delay)
+    
+    def can_handle(self, event):
+        return event.type == EventType.DATA_CHANGE
+    
+    async def _delete_request(self, session: aiohttp.ClientSession, url: str, headers: Dict[str, str]) -> tuple[Any, int]:
+        async with session.delete(url, headers=headers) as response:
+            response.raise_for_status()
+            status = response.status
+            return await self._convert_response(response), status
+
+
+class HTTPPatchRequestProcessor(HTTPProcessor):
+    """
+    Processor for handling HTTP PATCH requests.
+
+    Inherits from HTTPProcessor and implements the process method for PATCH requests.
+    """
+    async def process(self, event: GraphEvent, context: Dict[str, Any]):
+        if not self._validate_request_data(event.data):
+            error_event = self.create_error_event("Invalid request data", event, context["node_id"])
+            return error_event
+        
+        for attempt in range(self.retries):
+            try:
+                async with aiohttp.ClientSession(timeout=self.client_timeout) as session:
+                    response_data, status = await self._patch_request(session, event.data["url"], self.headers, event.data["data"])
+                    response_event = self._create_response_event(response_data, status, event, context["node_id"], attempt)
+                    return response_event
+            except Exception as e:
+                error_event = await self._handle_request_exceptions(attempt, event, context, e)
+                if error_event:
+                    return error_event  
+            
+            if attempt < self.retries - 1:
+                await asyncio.sleep(self.retry_delay)
+    
+    def can_handle(self, event):
+        return event.type == EventType.DATA_CHANGE
+    
+    async def _patch_request(self, session: aiohttp.ClientSession, url: str, headers: Dict[str, str], data: Any) -> tuple[Any, int]:
+        async with session.patch(url, headers=headers, json=data) as response:
+            response.raise_for_status()
+            status = response.status
             return await self._convert_response(response), status
