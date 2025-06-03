@@ -6,7 +6,7 @@ from  app.engine.graph.graph_event import EventType, GraphEvent, NodeState
 from  app.engine.interfaces.i_observer import IObserver
 from  app.engine.interfaces.i_processor import IProcessor
 from  app.engine.interfaces.i_subject import ISubject
-from  app.engine.interfaces.İ_middleware import IMiddleware
+from  app.engine.interfaces.i_middleware import IMiddleware
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -91,11 +91,7 @@ class BaseNode(IObserver, ISubject):
             self._metrics['errors'] += 1
             logger.error(f"Error in node {self.id}: {e}")
             
-            error_event = GraphEvent(
-                type=EventType.ERROR,
-                data={'error': str(e), 'original_event': event.to_dict()},
-                source_id=self.id
-            )
+            error_event = self.create_error_event(str(e), event, self.id)
             await self.notify_observers(error_event)
 
     def add_processor(self, processor: IProcessor) -> None:
@@ -128,6 +124,8 @@ class BaseNode(IObserver, ISubject):
         
         return True
     
+    
+    
     def _build_context(self) -> Dict[str, Any]:
         return {
             'node_id': self.id,
@@ -151,3 +149,16 @@ class BaseNode(IObserver, ISubject):
             'processors': len(self._processors),
             'middleware': len(self._middleware)
         }
+    def create_error_event(self, error_message: str, original_event: GraphEvent, node_id: str) -> GraphEvent:
+        return GraphEvent(
+            type=EventType.ERROR,
+            data={
+                "error": error_message,
+                "original_request": original_event.data
+            },
+            source_id=node_id,
+            metadata={
+                "status": "error",
+                **original_event.metadata
+            }
+        )
