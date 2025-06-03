@@ -2,7 +2,7 @@ import logging
 from typing import Any, Dict, List, Optional
 
 from  app.engine.graph.graph_event import GraphEvent
-from  app.engine.interfaces.İ_middleware import IMiddleware
+from  app.engine.interfaces.i_middleware import IMiddleware
 from  app.engine.nodes.base_node import BaseNode
 
 logging.basicConfig(level=logging.INFO)
