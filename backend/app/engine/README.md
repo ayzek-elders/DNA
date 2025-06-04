@@ -157,13 +157,3 @@
 *   **State Management:** Nodes maintain their own state (`NodeState`: IDLE, PROCESSING, ERROR, DISABLED).
 *   **Metrics & History:** `BaseNode` keeps basic metrics (events processed/sent, errors) and a history of recent events.
 *   **Graph Summary:** `graph.get_graph_summary()` provides an overview of the graph structure, node types, and edges.
-
-**To Extend and Customize:**
-
-*   Implement various `IProcessor` classes for different data transformations, computations, or I/O operations.
-*   Create specialized `BaseNode` subclasses for common node types (e.g., input nodes, output nodes, transformation nodes).
-*   Develop more sophisticated `IMiddleware` for concerns like authentication, validation, rate limiting, or advanced logging/tracing.
-*   Enhance `GraphEvent` with more specific event types or data structures as needed.
-*   Implement custom `IObserver` classes for tasks beyond simple node-to-node communication (e.g., writing to a database, sending notifications to external systems).
-
-This framework provides a solid foundation for building complex, real-time data processing pipelines.
