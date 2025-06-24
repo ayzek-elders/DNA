@@ -7,6 +7,9 @@ from datetime import datetime
 class EventType(Enum):
     DATA_CHANGE = "data_change"
     COMPUTATION_RESULT = "computation_result"
+    LLM_REQUEST = "llm_request"
+    LMM_RESPONSE = "llm_response"
+    LLM_TOKEN = "llm_token"
     ERROR = "error"
     ALERT = "alert"
     NOTIFICATION = "notification"

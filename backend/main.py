@@ -1,6 +1,6 @@
 import asyncio
 from typing import Dict, Any, Optional
-from app.engine.interfaces.İ_middleware import IMiddleware
+from app.engine.interfaces.i_middleware import IMiddleware
 from app.engine.nodes.base_node import BaseNode
 from app.engine.interfaces.i_processor import IProcessor
 from app.engine.graph.graph_event import GraphEvent, EventType
