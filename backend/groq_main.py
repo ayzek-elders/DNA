@@ -11,9 +11,9 @@ GROQ_NODE_TYPE = "groq_llm_node"
 GROQ_CONFIG = {
     "model": "llama3-70b-8192",
     "temperature": 0.7,
-    "streaming": True,
+    "streaming": False,
 }
-GROQ_API_KEY = "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"
+GROQ_API_KEY = ""
 
 class ResultNode(BaseNode):
     def __init__(self, node_id: str):

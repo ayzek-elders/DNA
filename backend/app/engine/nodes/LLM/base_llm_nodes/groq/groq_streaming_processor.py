@@ -97,12 +97,28 @@ class GroqStreamProcessor(IGroqProcessor):
             except asyncio.CancelledError:
                 pass     
     
-    async def process(self, event: GraphEvent, context: Dict[str, Any]):
+    # async def process(self, event: GraphEvent, context: Dict[str, Any]):
+    #     prompt = event.data
+    #     payload = {
+    #         "question" : prompt
+    #     }
+    #     print("LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOL")
+    #     async for token in self.invoke(question= prompt):
+    #         payload["token"] = token
+    #         print(token) #DELETE
+    #         yield GraphEvent(
+    #             type= EventType.LLM_TOKEN,
+    #             data= payload,
+    #             source_id=context["node_id"] 
+    #         )
+    
+    def process(self, event: GraphEvent, context: Dict[str, Any]):
         prompt = event.data
         payload = {
             "question" : prompt
         }
-        async for token in self.invoke(question= prompt):
+        print("LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOL")
+        for token in self.invoke(question= prompt):
             payload["token"] = token
             print(token) #DELETE
             yield GraphEvent(
@@ -110,6 +126,7 @@ class GroqStreamProcessor(IGroqProcessor):
                 data= payload,
                 source_id=context["node_id"] 
             )
+    
              
     def can_handle(self, event):
         return isinstance(event.data, str)
