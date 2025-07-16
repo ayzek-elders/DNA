@@ -13,7 +13,6 @@ GROQ_CONFIG = {
     "temperature": 0.7,
     "streaming": False,
 }
-GROQ_API_KEY = ""
 
 class ResultNode(BaseNode):
     def __init__(self, node_id: str):
@@ -26,7 +25,7 @@ class ResultNode(BaseNode):
 
 async def main():
     graph = ObserverGraph()
-    groq_node = GroqNode(GROQ_NODE_ID, GROQ_NODE_TYPE, config= GROQ_CONFIG, api_key= GROQ_API_KEY)
+    groq_node = GroqNode(GROQ_NODE_ID, GROQ_NODE_TYPE, config= GROQ_CONFIG)
     result_node = ResultNode("result_node")
     
     graph.add_node(groq_node)
