@@ -11,8 +11,6 @@ class GroqProcessor(IGroqProcessor):
         super().__init__()
         self.config = config.copy()  # Copy to avoid modifying original config
         api_key = config["api"]
-        if api_key:
-            os.environ["GROQ_API_KEY"] = api_key
 
         self.llm = ChatGroq(**self.config)
 
