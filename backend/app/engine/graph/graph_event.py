@@ -13,6 +13,7 @@ class EventType(Enum):
     ERROR = "error"
     ALERT = "alert"
     NOTIFICATION = "notification"
+    ROUTING_DECISION = "routing_decision"
     CUSTOM = "custom"
 
 class NodeState(Enum):
