@@ -97,7 +97,6 @@ try {
   Write-Host "Starting initialization process..." -ForegroundColor Cyan
     
   Import-DotEnv
-  Initialize-PostgreSQL
   Initialize-VirtualEnvironment
     
   Write-Host "Initialization completed successfully!" -ForegroundColor Green
