@@ -2,6 +2,7 @@ import logging
 from typing import Any, Dict, List, Optional
 
 from  app.engine.graph.graph_event import GraphEvent
+from app.engine.interfaces.i_lifecycle import ILifecycle
 from  app.engine.interfaces.i_middleware import IMiddleware
 from  app.engine.nodes.base_node import BaseNode
 
@@ -13,6 +14,16 @@ class ObserverGraph:
         self._nodes: Dict[str, BaseNode] = {}
         self._global_middleware: List[IMiddleware] = []
     
+    async def start(self) -> None:
+        for node in self._nodes.values():
+            if isinstance(node, ILifecycle):
+                await node.start()
+
+    async def stop(self) -> None:
+        for node in self._nodes.values():
+            if isinstance(node, ILifecycle):
+                await node.stop()
+
     def add_node(self, node: BaseNode) -> None:
         if node.id in self._nodes:
             raise ValueError(f"Node {node.id} already exists")
