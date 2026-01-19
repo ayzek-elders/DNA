@@ -14,6 +14,10 @@ class EventType(Enum):
     ALERT = "alert"
     NOTIFICATION = "notification"
     ROUTING_DECISION = "routing_decision"
+    MQTT_MESSAGE = "mqtt_message"
+    MQTT_PUBLISH = "mqtt_publish"
+    MQTT_CONNECTED = "mqtt_connected"
+    MQTT_DISCONNECTED = "mqtt_disconnected"
     CUSTOM = "custom"
 
 class NodeState(Enum):
