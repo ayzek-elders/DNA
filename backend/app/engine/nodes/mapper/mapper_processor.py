@@ -63,7 +63,6 @@ class MapperProcessor(IProcessor):
             "on_transform_error": "skip"
         })
 
-        # Pre-compile JMESPath expressions for performance
         self._compiled_mappings = self._compile_mappings(self.mappings)
 
     def can_handle(self, event: GraphEvent) -> bool:
@@ -110,11 +109,9 @@ class MapperProcessor(IProcessor):
                 target = mapping.get("target")
 
                 if value is not None or not mapping.get("required", False):
-                    # Apply transformation if specified
                     if "transform" in mapping and value is not None:
                         value = self._apply_transform(value, mapping["transform"])
 
-                    # Set the value (supports nested targets via dot notation)
                     if value is not None or mapping.get("default") is not None:
                         final_value = value if value is not None else mapping.get("default")
                         self._set_nested_value(result, target, final_value)
@@ -133,7 +130,6 @@ class MapperProcessor(IProcessor):
         array_config = self.array_settings
         source_path = array_config.get("source_path", "")
 
-        # Extract the source array using JMESPath
         if source_path:
             source_array = jmespath.search(source_path, data)
         else:
@@ -142,7 +138,6 @@ class MapperProcessor(IProcessor):
         if not isinstance(source_array, list):
             raise MappingError(f"Source path '{source_path}' did not resolve to an array")
 
-        # Apply optional filter using JsonLogic
         if "filter" in array_config:
             filter_condition = array_config["filter"]
             source_array = [
@@ -150,10 +145,8 @@ class MapperProcessor(IProcessor):
                 if jsonLogic(filter_condition, item)
             ]
 
-        # Apply item mappings to each element
         item_mappings = array_config.get("item_mappings", [])
         if item_mappings:
-            # Compile item mappings
             compiled_item_mappings = self._compile_mappings(item_mappings)
 
             result = []
@@ -187,7 +180,6 @@ class MapperProcessor(IProcessor):
         else:
             value = compiled.search(data)
 
-        # Handle missing values
         if value is None:
             if mapping.get("required", False):
                 raise MissingRequiredFieldError(f"Required field '{source}' not found")
