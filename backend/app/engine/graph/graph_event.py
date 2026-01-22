@@ -18,6 +18,7 @@ class EventType(Enum):
     MQTT_PUBLISH = "mqtt_publish"
     MQTT_CONNECTED = "mqtt_connected"
     MQTT_DISCONNECTED = "mqtt_disconnected"
+    LORAWAN_DOWNLINK = "lorawan_downlink"
     CUSTOM = "custom"
 
 class NodeState(Enum):
