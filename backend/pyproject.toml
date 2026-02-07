@@ -18,5 +18,4 @@ dependencies = [
     "pytest-cov>=6.1.1",
     "requests>=2.32.3",
     "ruff>=0.11.5",
-    "sqlmodel>=0.0.24",
 ]
