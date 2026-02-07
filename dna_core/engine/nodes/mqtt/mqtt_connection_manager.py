@@ -6,10 +6,12 @@ from typing import Any, Awaitable, Callable, Dict, List, Optional
 
 import aiomqtt
 
+from dna_core.engine.interfaces.i_conntection_manager import IConnectionManager
+
 logger = logging.getLogger(__name__)
 
 
-class MQTTConnectionManager:
+class MQTTConnectionManager(IConnectionManager):
     """
     Manages MQTT broker connection lifecycle including:
     - Initial connection with authentication
