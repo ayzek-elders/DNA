@@ -21,16 +21,28 @@ DNA Core is a flexible, extensible Python framework for building event-driven da
 
 ## Installation
 
-### From Private PyPI
-
-```bash
-pip install dna-core --index-url https://your-private-pypi.com/simple
-```
-
 ### From GitHub
 
 ```bash
 pip install git+https://github.com/your-org/dna-core.git
+```
+
+
+### Release Process
+
+We use automated releases via GitHub Actions. To release a new version:
+
+```bash
+# Bump version (updates pyproject.toml and __init__.py)
+python scripts/bump_version.py patch  # or minor, major
+
+# Commit and tag
+git add -u
+git commit -m "Bump version to X.Y.Z"
+git tag -a vX.Y.Z -m "Release X.Y.Z"
+
+# Push (triggers automated build and publish)
+git push origin main --tags
 ```
 
 ### Local Development
@@ -380,26 +392,3 @@ uv run ruff check dna_core
 # Build package
 uv build
 ```
-
-### Release Process
-
-We use automated releases via GitHub Actions. To release a new version:
-
-```bash
-# Bump version (updates pyproject.toml and __init__.py)
-python scripts/bump_version.py patch  # or minor, major
-
-# Commit and tag
-git add -u
-git commit -m "Bump version to X.Y.Z"
-git tag -a vX.Y.Z -m "Release X.Y.Z"
-
-# Push (triggers automated build and publish)
-git push origin main --tags
-```
-
-See [RELEASE.md](RELEASE.md) for complete documentation.
-
-## Support
-
-For support and questions, please contact the development team.
