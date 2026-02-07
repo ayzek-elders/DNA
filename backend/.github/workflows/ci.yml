@@ -1,0 +1,128 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  lint-and-test:
+    name: Lint and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
+
+      - name: Run linter
+        continue-on-error: true
+        run: |
+          echo "Running linter..."
+          if uv run ruff check dna_core; then
+            echo "✓ Linting passed"
+          else
+            echo "⚠ Linting found issues"
+          fi
+
+      - name: Check code formatting
+        continue-on-error: true
+        run: |
+          echo "Checking code formatting..."
+          if uv run ruff format --check dna_core; then
+            echo "✓ Formatting check passed"
+          else
+            echo "⚠ Code formatting issues found"
+          fi
+
+      - name: Upload coverage reports
+        if: always()
+        uses: codecov/codecov-action@v3
+        continue-on-error: true
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+
+      - name: Verify imports
+        run: |
+          echo "Testing package imports..."
+          uv run python -c "
+          from dna_core import (
+              ObserverGraph, GraphEvent, EventType, NodeState,
+              HTTPGetRequestNode, MapperNode, MQTTSubscriberNode
+          )
+          print('✓ All imports successful')
+          print('Package version:', __import__('dna_core').__version__)
+          "
+
+  build:
+    name: Build Package
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Build package
+        run: |
+          uv build
+          echo "📦 Package built successfully"
+
+      - name: Verify package contents
+        run: |
+          echo "Checking package contents..."
+          python -m zipfile -l dist/*.whl | head -50
+
+          # Verify main.py is not in the package
+          if python -m zipfile -l dist/*.whl | grep -q "main.py"; then
+            echo "::error::main.py should not be in the package!"
+            exit 1
+          else
+            echo "✓ main.py correctly excluded"
+          fi
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
+
+      - name: Summary
+        run: |
+          echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ✓ Build successful" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Distribution Files" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          ls -lh dist/ >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY

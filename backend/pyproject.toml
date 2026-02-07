@@ -1,9 +1,25 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
-name = "backend"
+name = "dna-core"
 version = "0.1.0"
-description = "Add your description here"
+description = "Event-driven graph engine for building data processing pipelines"
 readme = "README.md"
 requires-python = ">=3.13"
+license = {text = "Proprietary"}
+authors = [
+    {name = "Fatih Akkuş", email = "whitebirdsdk@gmail.com"},
+    {name = "Rabia Akkuş", email = "rabia.akkus@gmail.com"},
+    {name = "Muhammed Esad Doğan", email = "esad@gmail.com"}
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+]
 dependencies = [
     "aiohttp>=3.12.7",
     "aiomqtt>=2.0.0",
@@ -19,3 +35,7 @@ dependencies = [
     "requests>=2.32.3",
     "ruff>=0.11.5",
 ]
+
+[tool.hatch.build.targets.wheel]
+packages = ["dna_core"]
+exclude = ["main.py", ".venv", "*.pyc", "__pycache__", "*.egg-info"]
