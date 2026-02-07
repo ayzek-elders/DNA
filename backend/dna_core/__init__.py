@@ -31,7 +31,7 @@ from dna_core.engine.nodes.mqtt import MQTTSubscriberNode, MQTTPublisherNode
 # Note: GroqNode requires langchain-groq to be installed separately
 # Import it directly if needed: from dna_core.engine.nodes.LLM.base_llm_nodes.groq import GroqNode
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = [
     # Core graph
