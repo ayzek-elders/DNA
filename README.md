@@ -21,12 +21,6 @@ DNA Core is a flexible, extensible Python framework for building event-driven da
 
 ## Installation
 
-### From Private PyPI
-
-```bash
-pip install dna-core --index-url https://your-private-pypi.com/simple
-```
-
 ### From GitHub
 
 ```bash
