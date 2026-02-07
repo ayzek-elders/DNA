@@ -1,12 +1,12 @@
 import asyncio
 from typing import Dict, Any, Optional
-from app.engine.interfaces.i_middleware import IMiddleware
-from app.engine.nodes.base_node import BaseNode
-from app.engine.graph.graph_event import GraphEvent, EventType
-from app.engine.graph.graph import ObserverGraph
-from app.engine.nodes.http.http_node import HTTPGetRequestNode, HTTPPostRequestNode, HTTPPutRequestNode
-from app.engine.nodes.http.http_middleware import HTTPRequestLoggingMiddleware
-from app.engine.nodes.email.sender.emailsend_node import MailSenderNode
+from dna_core.engine.interfaces.i_middleware import IMiddleware
+from dna_core.engine.nodes.base_node import BaseNode
+from dna_core.engine.graph.graph_event import GraphEvent, EventType
+from dna_core.engine.graph.graph import ObserverGraph
+from dna_core.engine.nodes.http.http_node import HTTPGetRequestNode, HTTPPostRequestNode, HTTPPutRequestNode
+from dna_core.engine.nodes.http.http_middleware import HTTPRequestLoggingMiddleware
+from dna_core.engine.nodes.email.sender.emailsend_node import MailSenderNode
 
 
 class SimpleLoggingMiddleware(IMiddleware):
