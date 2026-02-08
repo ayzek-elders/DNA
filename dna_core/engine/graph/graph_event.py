@@ -18,6 +18,7 @@ class EventType(Enum):
     MQTT_PUBLISH = "mqtt_publish"
     MQTT_CONNECTED = "mqtt_connected"
     MQTT_DISCONNECTED = "mqtt_disconnected"
+    FILE_CONVERTED = "file_converted"
     CUSTOM = "custom"
 
 class NodeState(Enum):
