@@ -1,3 +1,4 @@
+import json
 import logging
 from typing import Dict, Any, Optional, Set, List
 import csv
@@ -49,6 +50,13 @@ class ConvertToCSVProcessor(IProcessor):
             return self._create_error_event(str(e), event, context["node_id"])
 
     def _convert_to_csv(self, data: Any) -> str | List[List[str]]:
+        
+        if isinstance(data, str):
+            try:
+                data = json.loads(data)
+            except json.JSONDecodeError:
+                pass
+            
         if not isinstance(data, list):
             data = [data]
 
