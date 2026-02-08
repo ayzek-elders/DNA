@@ -8,8 +8,7 @@ logger = logging.getLogger(__name__)
 
 class ConvertToHTMLProcessor(IProcessor):
     """
-    Processor that converts data to HTML format with interactive collapsible sections.
-    Generates a styled HTML document with expand/collapse controls for nested structures.
+    Processor that converts JSON data to HTML format
     """
     def __init__(self, config):
         super().__init__(config)
