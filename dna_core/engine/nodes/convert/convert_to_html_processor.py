@@ -1,3 +1,4 @@
+import json
 import logging
 from typing import Any, Dict, Optional
 
@@ -84,7 +85,12 @@ class ConvertToHTMLProcessor(IProcessor):
             <button onclick="toggleAll(false)">Collapse All</button>
         </div>
         """
-
+        if isinstance(data, str):
+            try:
+                data = json.loads(data)
+            except json.JSONDecodeError:
+                pass
+        
         body = "".join(self._generate_html(data))
         return f"<!DOCTYPE html><html><head>{style}</head><body>{controls}{body}{js}</body></html>"
 
