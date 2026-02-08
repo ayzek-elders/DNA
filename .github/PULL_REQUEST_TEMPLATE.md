@@ -1,7 +1,3 @@
-# Description
-
-<!-- Provide a brief description of the changes in this PR -->
-
 ## Type of Change
 
 - [ ] Bug fix (non-breaking change which fixes an issue)
