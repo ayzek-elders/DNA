@@ -19,30 +19,6 @@
 -
 -
 
-## Testing
-
-<!-- Describe the tests you ran to verify your changes -->
-
-- [ ] All existing tests pass
-- [ ] Added new tests for new functionality
-- [ ] Manually tested the changes
-- [ ] Verified imports work correctly
-
-## Checklist
-
-- [ ] My code follows the project's code style
-- [ ] I have performed a self-review of my code
-- [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation
-- [ ] My changes generate no new warnings
-- [ ] Any dependent changes have been merged and published
-
-## Related Issues
-
-<!-- Link to related issues using #issue_number -->
-
-Closes #
-Related to #
 
 ## Additional Notes
 
